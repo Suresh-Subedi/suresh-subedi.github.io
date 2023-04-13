@@ -15,6 +15,7 @@ window.addEventListener('load', function() {
             this.height = height;
             this.groundMargin = 80;
             this.speed = 0;
+            this.maxSpeed = 5;
             this.background = new Background(this);
             this.player = new Player(this);
             this.input = new InputHandler();
@@ -34,7 +35,7 @@ window.addEventListener('load', function() {
             }
             this.enemies.forEach(enemy => {
                 if(enemy.markedForDeletion) {
-                    enemies.splice(this.enemies.indexOf(enemy), 1);
+                    this.enemies.splice(this.enemies.indexOf(enemy), 1);
                 }
                 enemy.update(deltaTime);
             })
