@@ -1,1 +1,2 @@
-### Docs
+[Game](/game)
+[About](/about)
