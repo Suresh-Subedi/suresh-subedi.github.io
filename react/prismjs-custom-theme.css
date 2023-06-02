@@ -1,0 +1,41 @@
+/* PrismJS theme */
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background: #22282A;
+}
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #EC7600;
+}
+.token.atrule,
+.token.attr-value,
+.token.function {
+  color: #93C763;
+}
+.token.keyword {
+  color: #93C763;
+}
+
+/* TOC */
+@media only screen and (min-width: 600px) {
+  .toc {
+    width: 350px;
+    position: fixed;
+  }
+}
+
+/* Embedded List */
+tr:hover {
+  background-color: #f5f5f5;
+}
+td, th {
+  border: 1px solid #ddd;
+  padding: 3px;
+}
+.striked {
+  text-decoration: line-through;
+}
