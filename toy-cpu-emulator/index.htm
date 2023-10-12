@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toy Cpu Emulator</title>
+  </head>
+  <br>
+    <style>
+      canvas {
+        border: 1px solid green;
+      }
+      .flex-container-col {
+        display: flex;
+        flex-direction: column;
+      }
+      .flex-container {
+        display: flex;
+        flex-direction: row;
+      }
+      /* Responsive layout - makes a one column layout instead of a two-column layout */
+      @media (max-width: 800px) {
+        .flex-container {
+          flex-direction: column;
+        }
+      }
+    textarea {
+      width: 100%;
+    }
+    </style>
+
+    <div>
+      <span>Speed: <input id="speed" placeholder="Speed"/> Hz</span>
+      <span>
+        Program: <select id="choice">
+          <option value="flashLights">Flash lights</option>
+          <option value="flashLights1">Flash lights 1</option>
+          <option value="moveLight">Move lights</option>
+          <option value="countDown">Countdown</option>
+          <option value="add">Add</option>
+          <option value="compare">Compare</option>
+        </select>
+      </span>
+      <button id="run">Run</button>
+      <button id="reset">Reset</button>
+    </div>
+
+    <div class="flex-container">
+      <canvas id="canvas"></canvas>
+      <textarea id="code" rows="15"></textarea>      
+    </div>
+
+    <div class="flex-container-col">
+      <div>Modes: Input/Edit</div>      
+      <div>Input mode: Select address/counter: Up/Down, Enter: Edit mode, R: Run, Q: Quit</div>
+      <div>Edit mode: Select bit: Left/Right, Flip: Space, Enter: Done</div>
+    </div>
+
+
+    <div class="flex-container-col">
+      References:
+      <a href="https://jimhall.itch.io/toy-cpu">https://jimhall.itch.io/toy-cpu</a>
+      <a href="https://www.youtube.com/watch?v=zhoL1ZSjGfM">https://www.youtube.com/watch?v=zhoL1ZSjGfM</a>
+      <a href="https://github.com/freedosproject/toycpu">https://github.com/freedosproject/toycpu</a>
+    </div>
+    <script>
+      const height = 600;
+      const width = 900;      
+      const onColor = "#ff0000";
+      const offColor = "#660000";
+      const canvas = document.getElementById("canvas");
+      canvas.height = height;
+      canvas.width = width;
+      const ctx = canvas.getContext("2d");
+
+      let isEditMode = false;
+
+      let speed = 1; //Hz
+      let counter = 0;
+      let instruction = 0;
+      let instructionSetBit = 0;
+      let accumulator = 0;
+      let instructions = [];
+
+      const STOP = 0b00000000; //0
+      const RIGHT = 0b00000001; //1
+      const LEFT = 0b00000010; //2
+      const NOT = 0b00001111; //15
+      const AND = 0b00010001; //
+      const OR = 0b00010010; //
+      const XOR = 0b00010011; //
+      const LOAD = 0b00010100; //
+      const STORE = 0b00010101; //
+      const ADD = 0b00010110; //
+      const SUB = 0b00010111; //
+      const GOTO = 0b00011000; //
+      const IFZERO = 0b00011001; //
+      const NOP = 0b10000000; //
+
+      const flashLights = [
+        LOAD,
+        7,
+        LOAD,
+        8,
+        LOAD,
+        9,
+        STOP,
+        0b00001111,
+        0b11110000,
+        0b11111111,
+      ];
+
+      const flashLights1 = [LOAD, 7, NOT, OR, 7, NOP, STOP, 0b00001111];
+
+      const moveLight = [LOAD, 8, RIGHT, IFZERO, 7, GOTO, 2, STOP, 0b10000000];
+
+      const countDown = [
+        LOAD,
+        9,
+        SUB,
+        10,
+        IFZERO,
+        8,
+        GOTO,
+        2,
+        STOP,
+        0b00001111,
+        0b00000001,
+      ];
+
+      const add = [LOAD, 7, ADD, 8, STORE, 9, STOP, 1, 2, 0];
+
+      const compare = [LOAD, 9, XOR, 10, IFZERO, 8, LOAD, 11, STOP, 5, 1, 0b11111111];
+
+      instructions = flashLights;
+
+      ctx.fillStyle = offColor;
+
+      const disassemble = () => {
+
+      }
+      const assemble = () => {
+
+      }
+
+      const drawCircle = (x, y, radius, start = 0, end = 2 * Math.PI) => {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, start, end);
+        ctx.fill();
+      };
+
+      const drawArray = (x, y, item) => {
+        for (let i = 0; i < 8; i++) {
+          let isOn = (item >> i) & (1 === 1);
+          ctx.fillStyle = isOn ? onColor : offColor;
+          drawCircle(x - i * 50, y, 20);
+        }
+      };
+
+      const getValue = (address) => {
+        return instructions[address];
+      };
+
+      const sleep = (ms) => {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      };
+
+      const step = async () => {
+        update();       
+        await sleep((1 / speed) * 1000);
+        instruction = instructions[counter];
+      };
+
+      const reset = () => {        
+        counter = 0;
+        instruction = instructions[counter];
+        update();
+      }
+
+      const run = async () => {
+        reset();
+        while (instruction != 0) {
+          switch (instruction) {
+            case LOAD:
+              accumulator = getValue(getValue(++counter)); //get address and then get value at address
+              break;
+            case STORE:
+              instructions[getValue(getValue(++counter))] = accumulator;
+              break;
+            case NOT:
+              accumulator = ~accumulator & 0b11111111;
+              break;
+            case OR:
+              accumulator |= getValue(getValue(++counter));
+              break;
+            case AND:
+              accumulator &= getValue(getValue(++counter));
+              break;
+            case XOR:
+              accumulator ^= getValue(getValue(++counter));
+              break;
+            case RIGHT:
+              accumulator = accumulator >> 1;
+              break;
+            case LEFT:
+              accumulator = accumulator << 1;
+              break;
+            case IFZERO:
+              if (accumulator === 0) {
+                counter = instructions[++counter]; //will be counter + 1 at end
+                await step();
+                continue;
+              }
+              break;
+            case GOTO:
+              counter = instructions[++counter];
+              await step();
+              continue;
+              break;
+            case SUB:
+              accumulator -= getValue(getValue(++counter));
+              break;
+            case ADD:
+              accumulator += getValue(getValue(++counter));
+              break;
+            case NOP:
+              break;
+          }
+          counter++;
+          await step();
+        }
+      };
+      document.querySelector("#run").onclick = _ => run();
+      document.querySelector("#reset").onclick = _ => reset();
+
+      const speedInput = document.querySelector("#speed");
+      speedInput.value = speed;
+      speedInput.onchange = e => speed = parseInt(e.target.value);      
+
+      const instructionsDict = {
+        "flashLights": flashLights,
+        "flashLights1": flashLights1,
+        "moveLight": moveLight,
+        "countDown": countDown,
+        "add": add,
+        "compare": compare
+      }
+      const select = document.querySelector("#choice");
+      Object.keys(instructionsDict).map(k => {
+        const option = document.createElement('option');
+        option.value = k,
+        option.innerText = k
+        select.appendChild(option);
+      });
+      select.onchange = e => {
+        console.log(e.target.value);
+        instructions = instructionsDict[e.target.value];
+      }
+
+      const drawInstruction = (x, y, item) => {
+        for (let i = 0; i < 8; i++) {
+          let isOn = (instructions[counter] >> i) & (1 === 1);
+          ctx.fillStyle = isOn ? onColor : offColor;
+          drawCircle(x - i * 50, y, 20);
+          if (instructionSetBit === i && isEditMode) {
+            ctx.fillStyle = offColor;
+            ctx.fillRect(x - i * 50 - 10, y + 25, 20, 5);
+          }
+        }
+      };      
+
+      const update = () => {
+        ctx.clearRect(0, 0, width, height);
+        const x = 5;
+        const y = height - 105;
+        ctx.beginPath();
+        ctx.font = "23px Arial";
+        ctx.fillText("Mode: " + (isEditMode ? "Edit" : "Input"), x, y + 100);
+
+        ctx.fillText("Counter: " + counter, 30, 25);
+        drawArray(400, 55, counter);
+
+        ctx.fillStyle = offColor;
+        ctx.fillText("Instruction", 480, 25);
+        drawInstruction(850, 55, instruction);
+
+        ctx.fillStyle = offColor;
+        ctx.fillText("Accumulator: " + accumulator, 480, 125);
+        drawArray(850, 155, accumulator);
+
+        ctx.fillStyle = offColor;
+        ctx.fillText("INI  HLT ERR ABT RUN EDT INP PWR", 485, 225);
+        drawArray(850, 255);
+
+        ctx.font = "16px Arial";
+        ctx.fillText("_ _ _ _ _ _ _ _ STOP", 10, 300);
+        ctx.fillText("_ _ _ _ _ _ _ o RIGHT", 10, 320);
+        ctx.fillText("_ _ _ _ _ _ o _ LEFT", 10, 340);
+        ctx.fillText("_ _ _ _ o o o o NOT", 10, 360);
+        ctx.fillText("_ _ _ o _ _ _ o AND addr", 10, 380);
+        ctx.fillText("_ _ _ o _ _ o _ OR addr", 10, 400);
+        ctx.fillText("_ _ _ o _ _ o o XOR addr", 10, 420);
+        ctx.fillText("_ _ _ o _ o _ _ LOAD addr", 10, 440);
+        ctx.fillText("_ _ _ o _ o _ o STORE addr", 10, 460);
+        ctx.fillText("_ _ _ o _ o o _ ADD addr", 10, 480);
+        ctx.fillText("_ _ _ o _ o o o SUB addr", 10, 500);
+        ctx.fillText("_ _ _ o o _ _ _ GOTO addr", 10, 520);
+        ctx.fillText("_ _ _ o o _ _ o IFZERO addr", 10, 540);
+        ctx.fillText("o _ _ _ _ _ _ _ NOP", 10, 560);
+      };
+
+      update();
+
+      canvas.addEventListener("keydown", (e) => {
+        if (isEditMode) {
+          if (e.keyCode === 'ArrowLeft') {
+            //left
+            instructionSetBit += 1;
+            instructionSetBit %= 8;
+            update();
+          } else if (e.key === 'ArrowRight') {
+            //right
+            if (instructionSetBit > 0) {
+              instructionSetBit -= 1;
+            } else {
+              instructionSetBit = 7;
+            }
+            update();
+          } else if (e.key === ' ') {
+            //space
+            const currentBit =
+              (instructions[counter] >> instructionSetBit) & (1 === 1);
+            instructions[counter] =
+              instructions[counter] ^ (1 << instructionSetBit);
+            update();
+          } else if (e.key === 'Enter') {
+            //enter
+            isEditMode = false;
+            update();
+          }
+        } else {
+          if (e.key === 'ArrowUp') {
+            //up            
+            e.preventDefault();
+            if (counter > 0) {
+              counter -= 1;
+            } else {
+              counter = 255;
+            }
+            update();
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            //down
+            counter += 1;
+            counter %= 256;
+            update();
+          } else if (e.key === 'Enter') {
+            //enter
+            isEditMode = true;
+            update();
+          } else if (e.key === 'r') {
+            //r
+            run();
+          } else {
+            console.log(e.key);
+          }
+        }
+      });
+    </script>
+
+  </body>
+</html>
