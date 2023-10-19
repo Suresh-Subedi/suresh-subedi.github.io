@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toy Cpu Emulator</title>
+  </head>
+  <br>
+    <style>
+      canvas {
+        border: 1px solid green;
+      }
+      .flex-container-col {
+        display: flex;
+        flex-direction: column;
+      }
+      .flex-container {
+        display: flex;
+        flex-direction: row;
+      }
+      /* Responsive layout - makes a one column layout instead of a two-column layout */
+      @media (max-width: 800px) {
+        .flex-container {
+          flex-direction: column;
+        }
+      }
+    textarea {
+      width: 100%;
+    }
+    </style>
+
+    <div>
+      <span>Speed: <input id="speed" placeholder="Speed"/> Hz</span>
+      <span>
+        Program: <select id="choice">
+          <option value="flashLights">Flash lights</option>
+          <option value="flashLights1">Flash lights 1</option>
+          <option value="moveLight">Move lights</option>
+          <option value="countDown">Countdown</option>
+          <option value="add">Add</option>
+          <option value="compare">Compare</option>
+        </select>
+      </span>
+      <button id="run">Run</button>
+      <button id="step">Step</button>
+      <button id="reset">Reset</button>
+      <button id="assemble">Assemble</button>
+      <button id="assembleAndRun">Assemble & Run</button>
+      <button id="disassemble">Disassemble</button>
+      <button id="download">Download</button>
+      Upload: <input id="upload" type="file"/>
+    </div>
+
+    <div class="flex-container">
+      <canvas id="canvas"></canvas>
+      <textarea id="code" rows="15"></textarea>      
+    </div>
+
+    <div class="flex-container-col">
+      <div>Modes: Input/Edit</div>      
+      <div>Input mode: Select address/counter: Up/Down, Edit mode: Enter, Run: R, Quit: Q</div>
+      <div>Edit mode: Select bit: Left/Right, Flip: Space, Done: Enter</div>
+    </div>
+
+
+    <div class="flex-container-col">
+      References:
+      <a href="https://jimhall.itch.io/toy-cpu">https://jimhall.itch.io/toy-cpu</a>
+      <a href="https://www.youtube.com/watch?v=zhoL1ZSjGfM">https://www.youtube.com/watch?v=zhoL1ZSjGfM</a>
+      <a href="https://github.com/freedosproject/toycpu">https://github.com/freedosproject/toycpu</a>
+      <div></div>
+    </div>
+
+    <code>
+      <div>. . . . . . . . STOP</div>
+      <div>. . . . . . . 1 RIGHT</div>
+      <div>. . . . . . 1 . LEFT</div>
+      <div>. . . . 1 1 1 1 NOT</div>
+      <div>. . . 1 . . . 1 AND addr</div>
+      <div>. . . 1 . . 1 . OR addr</div>
+      <div>. . . 1 . . 1 1 XOR addr</div>
+      <div>. . . 1 . 1 . . LOAD addr</div>
+      <div>. . . 1 . 1 . 1 STORE addr</div>
+      <div>. . . 1 . 1 1 . ADD addr</div>
+      <div>. . . 1 . 1 1 1 SUB addr</div>
+      <div>. . . 1 1 . . . GOTO addr</div>
+      <div>. . . 1 1 . . 1 IFZERO addr</div>
+      <div>1 . . . . . . . NOP</div>
+    </code>
+    <script src="index.js"></script>
+
+  </body>
+</html>
