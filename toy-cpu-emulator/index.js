@@ -1,4 +1,4 @@
-const height = 600;
+const height = 800;
 const width = 900;
 const onColor = "#ff0000";
 const offColor = "#660000";
@@ -87,6 +87,7 @@ const countDown = [
 const add = [LOAD, 7, ADD, 8, STORE, 9, STOP, 1, 2, 0];
 
 const compare = [LOAD, 9, XOR, 10, IFZERO, 8, LOAD, 11, STOP, 5, 1, 0b11111111];
+const test = [XOR, 10, IFZERO, 8, LOAD, 11, STOP];
 
 instructions = flashLights;
 
@@ -134,11 +135,16 @@ const assemble = () => {
   const codeString = code.value;
   const lines = codeString.split("\n");
   const commands = [];
-  lines.forEach((line) => {
+  const labels = {};
+  lines.forEach((line, index) => {
     const bytes = line.split(" ");
-    bytes.forEach((byte) =>
-      commands.push(instructionsDict[byte] ?? parseInt(byte))
-    );
+    bytes.forEach((byte) => {
+      if(bytes.startsWith(":")) {
+        labels[bytes.slice(1)] = index;
+      } else {
+        commands.push(instructionsDict[byte] ?? parseInt(byte));
+      }
+    });
   });
   instructions = commands;
   console.log(instructions);
@@ -260,14 +266,8 @@ document.querySelector("#assembleAndRun").onclick = assembleAndRun;
 const download = function () {
   const link = document.createElement("a");
   link.download = "toy_cpu_binary.tc";
-  const view = new Uint8Array(instructions);
-  //   const data = btoa(view);
-  //const buffer = Buffer.from(view).toString("base64");
-  console.log(view);
-  //data = "data:application/octet-stream;base64," + buffer;
-  const blob = new Blob([ instructions ], { type: "application/octet-stream" });
+  const blob = new Blob([instructions], { type: "application/octet-stream" });
   const data = URL.createObjectURL(blob);
-  console.log(data);
   link.href = data;
   link.click();
   URL.revokeObjectURL(link.href);
@@ -309,21 +309,36 @@ Object.keys(programsDict).map((k) => {
 select.onchange = (e) => {
   instructions = programsDict[e.target.value];
   code.value = disassemble(instructions);
+  reset();
 };
 
-const drawInstruction = (x, y) => {
+/**
+ *
+ * @param {number} endX
+ * @param {number} y
+ */
+const drawInstruction = (endX, y) => {
   for (let i = 0; i < 8; i++) {
     let isOn = (instructions[counter] >> i) & (1 === 1);
     ctx.fillStyle = isOn ? onColor : offColor;
-    drawCircle(x - i * 50, y, 20);
+    drawCircle(endX - i * 50, y, 20);
     if (instructionSetBit === i && isEditMode) {
       ctx.fillStyle = offColor;
-      ctx.fillRect(x - i * 50 - 10, y + 25, 20, 5);
+      ctx.fillRect(endX - i * 50 - 10, y + 25, 20, 5);
     }
   }
 };
 
 const update = () => {
+  let startX = 30;
+  let startY = 100;
+  let spacing = 40;
+  const isDesktop = false;
+  if(isDesktop) {
+    startX = 480;
+    startY = 25;
+    spacing = 50;
+  }
   ctx.clearRect(0, 0, width, height);
   const x = 5;
   const y = height - 105;
@@ -334,17 +349,29 @@ const update = () => {
   ctx.fillText("Counter: " + counter, 30, 25);
   drawArray(400, 55, counter);
 
-  ctx.fillStyle = offColor;
-  ctx.fillText("Instruction", 480, 25);
-  drawInstruction(850, 55, instruction);
+  ctx.fillStyle = offColor; 
+  ctx.fillText("Instruction", startX, startY);
+  startY += spacing;
+  drawInstruction(startX + 370, startY);
 
   ctx.fillStyle = offColor;
-  ctx.fillText(`Accumulator: 0x${accumulator.toString(16).toUpperCase().padStart(2, '0')} ${accumulator}`, 480, 125);
-  drawArray(850, 155, accumulator);
+  startY += spacing;
+  ctx.fillText(
+    `Accumulator: 0x${accumulator
+      .toString(16)
+      .toUpperCase()
+      .padStart(2, "0")} ${accumulator}`,
+    startX,
+    startY
+  );
+  startY += spacing;
+  drawArray(startX + 370, startY, accumulator);
 
   ctx.fillStyle = offColor;
-  ctx.fillText("INI  HLT ERR ABT RUN EDT INP PWR", 485, 225);
-  drawArray(850, 255);
+  startY += spacing;
+  ctx.fillText("INI  HLT ERR ABT RUN EDT INP PWR", startX, startY);
+  startY += spacing;
+  drawArray(startX + 370, startY);
 
   ctx.font = "16px Arial";
   ctx.fillText("_ _ _ _ _ _ _ _ STOP", 10, 300);
@@ -415,8 +442,6 @@ document.addEventListener("keydown", (e) => {
     } else if (e.key === "r") {
       //r
       run();
-    } else {
-      console.log(e.key);
     }
   }
 });

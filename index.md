@@ -1,6 +1,7 @@
 [Toy CPU Emulator](/toy-cpu-emulator)
 [Game](/game)
 [React](/react)
+[Programmer's Azerty](/programmers-azerty)
 [About](/about)
 
 
