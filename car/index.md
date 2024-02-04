@@ -29,6 +29,6 @@ V = IxR
 
 | Number | Color | Description |
 |--|--|--|
-|3|Green-Grey|Key1, Tip|
+|3|Green-Grey|Key1, Tip, Steering wheel control|
 |10|Violet|Key2, Ground|
 |11|Pink|Mode: connect to ground to change lcd mode|
