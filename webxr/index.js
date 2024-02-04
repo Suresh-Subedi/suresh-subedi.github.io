@@ -5,7 +5,7 @@ function onResize() { // this function resizes our canvas in a way, that makes i
 	canvas.width = canvas.clientWidth * window.devicePixelRatio;
 	canvas.height = canvas.clientHeight * window.devicePixelRatio;
 }
-
+initWebGL2();
 window.onresize = onResize; // sets the window's resize function to be the exact function we use for resizing our canvas
 
 function initWebGL2() {

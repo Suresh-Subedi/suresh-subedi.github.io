@@ -26,3 +26,9 @@ V = IxR
 |743 |2K  |Up    |
 |1625|2k  |+     |
 |3.13|20K |-     |
+
+| Number | Color | Description |
+|--|--|--|
+|3|Green-Grey|Key1, Tip|
+|10|Violet|Key2, Ground|
+|11|Pink|Mode: connect to ground to change lcd mode|

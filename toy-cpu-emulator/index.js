@@ -299,13 +299,14 @@ const programsDict = {
   countDown: countDown,
   add: add,
   compare: compare,
+  test: test,
 };
 const select = document.querySelector("#choice");
-Object.keys(programsDict).map((k) => {
-  const option = document.createElement("option");
-  (option.value = k), (option.innerText = k);
-  select.appendChild(option);
-});
+// Object.keys(programsDict).map((k) => {
+//   const option = document.createElement("option");
+//   (option.value = k), (option.innerText = k);
+//   select.appendChild(option);
+// });
 select.onchange = (e) => {
   instructions = programsDict[e.target.value];
   code.value = disassemble(instructions);
