@@ -374,21 +374,23 @@ const update = () => {
   startY += spacing;
   drawArray(startX + 370, startY);
 
+  const x1 = 10;
+  const y1 = 350;
   ctx.font = "16px Arial";
-  ctx.fillText("_ _ _ _ _ _ _ _ STOP", 10, 350);
-  ctx.fillText("_ _ _ _ _ _ _ o RIGHT", 10, 370);
-  ctx.fillText("_ _ _ _ _ _ o _ LEFT", 10, 390);
-  ctx.fillText("_ _ _ _ o o o o NOT", 10, 410);
-  ctx.fillText("_ _ _ o _ _ _ o AND addr", 10, 430);
-  ctx.fillText("_ _ _ o _ _ o _ OR addr", 10, 450);
-  ctx.fillText("_ _ _ o _ _ o o XOR addr", 10, 470);
-  ctx.fillText("_ _ _ o _ o _ _ LOAD addr", 10, 490);
-  ctx.fillText("_ _ _ o _ o _ o STORE addr", 10, 510);
-  ctx.fillText("_ _ _ o _ o o _ ADD addr", 10, 530);
-  ctx.fillText("_ _ _ o _ o o o SUB addr", 10, 550);
-  ctx.fillText("_ _ _ o o _ _ _ GOTO addr", 10, 570);
-  ctx.fillText("_ _ _ o o _ _ o IFZERO addr", 10, 590);
-  ctx.fillText("o _ _ _ _ _ _ _ NOP", 10, 610);
+  ctx.fillText("_ _ _ _ _ _ _ _ STOP", x1, y1 + 20 * 0);
+  ctx.fillText("_ _ _ _ _ _ _ o RIGHT", x1, y1 + 20 * 1);
+  ctx.fillText("_ _ _ _ _ _ o _ LEFT", x1, y1 + 20 * 2);
+  ctx.fillText("_ _ _ _ o o o o NOT", x1, y1 + 20 * 3);
+  ctx.fillText("_ _ _ o _ _ _ o AND addr", x1, y1 + 20 * 4);
+  ctx.fillText("_ _ _ o _ _ o _ OR addr", x1, y1 + 20 * 5);
+  ctx.fillText("_ _ _ o _ _ o o XOR addr", x1, y1 + 20 * 6);
+  ctx.fillText("_ _ _ o _ o _ _ LOAD addr", x1, y1 + 20 * 7);
+  ctx.fillText("_ _ _ o _ o _ o STORE addr", x1, y1 + 20 * 8);
+  ctx.fillText("_ _ _ o _ o o _ ADD addr", x1, y1 + 20 * 9);
+  ctx.fillText("_ _ _ o _ o o o SUB addr", x1, y1 + 20 * 10);
+  ctx.fillText("_ _ _ o o _ _ _ GOTO addr", x1, y1 + 20 * 11);
+  ctx.fillText("_ _ _ o o _ _ o IFZERO addr", x1, y1 + 20 * 12);
+  ctx.fillText("o _ _ _ _ _ _ _ NOP", x1, y1 + 20 * 13);
 };
 
 update();
