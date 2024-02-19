@@ -375,20 +375,20 @@ const update = () => {
   drawArray(startX + 370, startY);
 
   ctx.font = "16px Arial";
-  ctx.fillText("_ _ _ _ _ _ _ _ STOP", 10, 300);
-  ctx.fillText("_ _ _ _ _ _ _ o RIGHT", 10, 320);
-  ctx.fillText("_ _ _ _ _ _ o _ LEFT", 10, 340);
-  ctx.fillText("_ _ _ _ o o o o NOT", 10, 360);
-  ctx.fillText("_ _ _ o _ _ _ o AND addr", 10, 380);
-  ctx.fillText("_ _ _ o _ _ o _ OR addr", 10, 400);
-  ctx.fillText("_ _ _ o _ _ o o XOR addr", 10, 420);
-  ctx.fillText("_ _ _ o _ o _ _ LOAD addr", 10, 440);
-  ctx.fillText("_ _ _ o _ o _ o STORE addr", 10, 460);
-  ctx.fillText("_ _ _ o _ o o _ ADD addr", 10, 480);
-  ctx.fillText("_ _ _ o _ o o o SUB addr", 10, 500);
-  ctx.fillText("_ _ _ o o _ _ _ GOTO addr", 10, 520);
-  ctx.fillText("_ _ _ o o _ _ o IFZERO addr", 10, 540);
-  ctx.fillText("o _ _ _ _ _ _ _ NOP", 10, 560);
+  ctx.fillText("_ _ _ _ _ _ _ _ STOP", 10, 350);
+  ctx.fillText("_ _ _ _ _ _ _ o RIGHT", 10, 370);
+  ctx.fillText("_ _ _ _ _ _ o _ LEFT", 10, 390);
+  ctx.fillText("_ _ _ _ o o o o NOT", 10, 410);
+  ctx.fillText("_ _ _ o _ _ _ o AND addr", 10, 430);
+  ctx.fillText("_ _ _ o _ _ o _ OR addr", 10, 450);
+  ctx.fillText("_ _ _ o _ _ o o XOR addr", 10, 470);
+  ctx.fillText("_ _ _ o _ o _ _ LOAD addr", 10, 490);
+  ctx.fillText("_ _ _ o _ o _ o STORE addr", 10, 510);
+  ctx.fillText("_ _ _ o _ o o _ ADD addr", 10, 530);
+  ctx.fillText("_ _ _ o _ o o o SUB addr", 10, 550);
+  ctx.fillText("_ _ _ o o _ _ _ GOTO addr", 10, 570);
+  ctx.fillText("_ _ _ o o _ _ o IFZERO addr", 10, 590);
+  ctx.fillText("o _ _ _ _ _ _ _ NOP", 10, 610);
 };
 
 update();
