@@ -219,9 +219,15 @@ const run = async () => {
     await delay();
   }
 };
-document.querySelector("#run").onclick = run;
-document.querySelector("#reset").onclick = reset;
-document.querySelector("#step").onclick = stepOnce;
+const runBtn = document.querySelector("#run");
+runBtn.onclick = run;
+
+const resetBtn = document.querySelector("#reset");
+resetBtn.onclick = reset;
+
+const stepBtn = document.querySelector("#step");
+stepBtn.onclick = stepOnce;
+
 const disasm = document.querySelector("#disassemble");
 disasm.onclick = () => disassemble(instructions);
 
@@ -324,6 +330,8 @@ fileInput.onchange = (e) => {
     reader1.onload = (e) => {
       code.value = e.target.result;
       instructions = [];
+      runBtn.disabled = true;
+      stepBtn.disabled = true;
     };
     reader1.readAsText(selectedFile);
   }  
