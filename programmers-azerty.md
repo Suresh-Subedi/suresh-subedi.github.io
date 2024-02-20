@@ -24,7 +24,7 @@ So I wrote a AutoHotKey script to swap them.
 ```
 
 ### The Ugly
-[, ] requires AltGr
+[, ] requires AltGr \
 ´, ` requires AltGr and must be typed twice or with space/other key (dead key)
 
 ### The Good
