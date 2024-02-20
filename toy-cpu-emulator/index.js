@@ -1,5 +1,5 @@
-const height = 800;
-const width = 900;
+const height = 625;
+const width = 410;
 const onColor = "#ff0000";
 const offColor = "#660000";
 const canvas = document.getElementById("canvas");
@@ -230,7 +230,10 @@ asmBtn.onclick = assemble;
 
 const asmR = document.querySelector("#assembleAndRun");
 asmR.onclick = assembleAndRun;
-
+/**
+ * 
+ * @param {boolean} isBinary1 
+ */
 const updateUi = (isBinary1) => {
   disasm.disabled = !isBinary1;
   asmBtn.disabled = isBinary1;
@@ -283,8 +286,17 @@ const disassemble = (instructions) => {
 
 const download = function () {
   const link = document.createElement("a");
-  link.download = `toy_cpu_binary.tc${isBinary ? "b" : "s"}`;
-  const blob = new Blob([code.value], { type: "application/octet-stream" });
+  const name = "toy_cpu_binary.tc";
+  let blob;
+  if(isBinary) {
+    const arr = code.value.split(",").map(x => parseInt(x))
+    content = new Uint8Array(arr).buffer;
+    blob = new Blob([content], { type: "application/octet-stream" });
+    link.download = `${name}b`;
+  } else {
+    blob = new Blob([code.value], { type: "application/octet-stream" })
+    link.download = `${name}s`;
+  }
   const data = URL.createObjectURL(blob);
   link.href = data;
   link.click();
@@ -295,21 +307,27 @@ document.querySelector("#download").onclick = download;
 const fileInput = document.getElementById("upload");
 fileInput.onchange = (e) => {
   const selectedFile = e.srcElement.files[0];
-  const isBinary1 = selectedFile.name.endsWith(".tcb");
+  const isBinaryFile = selectedFile.name.endsWith(".tcb");
   const reader = new FileReader();
   reader.onload = (e) => {
-    const buffer = e.target.result;
-    const view = new Uint8Array(buffer);
-    instructions = view;
+    if(isBinaryFile) {      
+      const buffer = e.target.result;
+      const view = new Uint8Array(buffer);
+      code.value = view.map(x => x.toString()).join(",");
+      instructions = view;
+    }
   };
   reader.readAsArrayBuffer(selectedFile);
 
-  const reader1 = new FileReader();
-  reader1.onload = (e) => {
-    code.value = e.target.result;
-  };
-  reader1.readAsText(selectedFile);
-  updateUi(isBinary1);
+  if(!isBinaryFile) {
+    const reader1 = new FileReader();
+    reader1.onload = (e) => {
+      code.value = e.target.result;
+      instructions = [];
+    };
+    reader1.readAsText(selectedFile);
+  }  
+  updateUi(isBinaryFile);
 };
 
 const speedInput = document.querySelector("#speed");
@@ -355,19 +373,16 @@ const drawInstruction = (endX, y) => {
 };
 
 const update = () => {
-  let startX = 5;
-  let startY = 0;
-  let spacing = 47;
   ctx.clearRect(0, 0, width, height);
-
-  const x = 5;
-  const y = height - 105;
   ctx.beginPath();
   ctx.font = "23px Arial";
-  ctx.fillText("Mode: " + (isEditMode ? "Edit" : "Input"), x, y + 100);
 
-  startY += spacing;
-  ctx.fillText("Counter: " + counter, startX, 25);
+  let startX = 5;
+  let startY = 25;
+  let spacing = 45;
+
+  ctx.fillText("Counter: " + counter, startX, startY);  
+  startY += spacing * 0.6;
   drawLeds(startX + 370, startY, counter);
 
   ctx.fillStyle = offColor;
@@ -396,7 +411,7 @@ const update = () => {
   drawLeds(startX + 370, startY);
 
   const x1 = startX;
-  const y1 = startY + spacing;
+  const y1 = startY + 40;
   ctx.font = "16px Arial";
   ctx.fillText("_ _ _ _ _ _ _ _ STOP", x1, y1 + 20 * 0);
   ctx.fillText("_ _ _ _ _ _ _ o RIGHT", x1, y1 + 20 * 1);
@@ -412,6 +427,9 @@ const update = () => {
   ctx.fillText("_ _ _ o o _ _ _ GOTO addr", x1, y1 + 20 * 11);
   ctx.fillText("_ _ _ o o _ _ o IFZERO addr", x1, y1 + 20 * 12);
   ctx.fillText("o _ _ _ _ _ _ _ NOP", x1, y1 + 20 * 13);
+  
+  ctx.font = "23px Arial";
+  ctx.fillText("Mode: " + (isEditMode ? "Edit" : "Input"), x1, y1 + 20 * 15);
 };
 
 const init = () => {

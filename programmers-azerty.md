@@ -25,7 +25,7 @@ So I wrote a AutoHotKey script to swap them.
 
 ### The Ugly
 [, ] requires AltGr
-´, ` requires AltGr
+´, ` requires AltGr and must be typed twice or with space/other key (dead key)
 
 ### The Good
 It is not only bad though as a programmer. It also has some positive sides. For some symbols, like &, ", ', (, !, ), $, ; and :, you don't have to press any other keys (Shift, AltGr). Querty would have been nice for programmers if symbols were default instead of numbers.
