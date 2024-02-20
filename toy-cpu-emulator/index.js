@@ -125,9 +125,9 @@ const drawCircle = (x, y, radius, start = 0, end = 2 * Math.PI) => {
   ctx.fill();
 };
 
-const drawArray = (x, y, item) => {
+const drawLeds = (x, y, binaryNumber) => {
   for (let i = 0; i < 8; i++) {
-    let isOn = (item >> i) & (1 === 1);
+    let isOn = (binaryNumber >> i) & (1 === 1);
     ctx.fillStyle = isOn ? onColor : offColor;
     drawCircle(x - i * 50, y, 20);
   }
@@ -355,28 +355,25 @@ const drawInstruction = (endX, y) => {
 };
 
 const update = () => {
-  let startX = 30;
-  let startY = 100;
-  let spacing = 40;
-  const isDesktop = false;
-  if (isDesktop) {
-    startX = 480;
-    startY = 25;
-    spacing = 50;
-  }
+  let startX = 5;
+  let startY = 0;
+  let spacing = 47;
   ctx.clearRect(0, 0, width, height);
+
   const x = 5;
   const y = height - 105;
   ctx.beginPath();
   ctx.font = "23px Arial";
   ctx.fillText("Mode: " + (isEditMode ? "Edit" : "Input"), x, y + 100);
 
-  ctx.fillText("Counter: " + counter, 30, 25);
-  drawArray(400, 55, counter);
+  startY += spacing;
+  ctx.fillText("Counter: " + counter, startX, 25);
+  drawLeds(startX + 370, startY, counter);
 
   ctx.fillStyle = offColor;
-  ctx.fillText("Instruction", startX, startY);
   startY += spacing;
+  ctx.fillText("Instruction", startX, startY);
+  startY += spacing * 0.6;
   drawInstruction(startX + 370, startY);
 
   ctx.fillStyle = offColor;
@@ -389,17 +386,17 @@ const update = () => {
     startX,
     startY
   );
-  startY += spacing;
-  drawArray(startX + 370, startY, accumulator);
+  startY += spacing * 0.6;
+  drawLeds(startX + 370, startY, accumulator);
 
   ctx.fillStyle = offColor;
   startY += spacing;
   ctx.fillText("INI  HLT ERR ABT RUN EDT INP PWR", startX, startY);
-  startY += spacing;
-  drawArray(startX + 370, startY);
+  startY += spacing * 0.6;
+  drawLeds(startX + 370, startY);
 
-  const x1 = 10;
-  const y1 = 350;
+  const x1 = startX;
+  const y1 = startY + spacing;
   ctx.font = "16px Arial";
   ctx.fillText("_ _ _ _ _ _ _ _ STOP", x1, y1 + 20 * 0);
   ctx.fillText("_ _ _ _ _ _ _ o RIGHT", x1, y1 + 20 * 1);
