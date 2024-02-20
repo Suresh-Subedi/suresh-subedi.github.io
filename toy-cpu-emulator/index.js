@@ -6,6 +6,7 @@ const canvas = document.getElementById("canvas");
 canvas.height = height;
 canvas.width = width;
 const ctx = canvas.getContext("2d");
+ctx.fillStyle = offColor;
 
 let isEditMode = false;
 
@@ -15,6 +16,8 @@ let instruction = 0;
 let instructionSetBit = 0;
 let accumulator = 0;
 let instructions = [];
+
+let isBinary = false;
 
 const instructionsDict = {
   STOP: 0b00000000, //0
@@ -85,52 +88,11 @@ const countDown = [
 ];
 
 const add = [LOAD, 7, ADD, 8, STORE, 9, STOP, 1, 2, 0];
-
 const compare = [LOAD, 9, XOR, 10, IFZERO, 8, LOAD, 11, STOP, 5, 1, 0b11111111];
 const test = [XOR, 10, IFZERO, 8, LOAD, 11, STOP];
 
 instructions = flashLights;
 
-ctx.fillStyle = offColor;
-
-const disassemble = (instructions) => {
-  const output = [];
-  let isStop = false;
-  const getName = (ins) =>
-    `0x${ins.toString(16).toUpperCase().padStart(2, "0")}`;
-  for (let i = 0; i < instructions.length; i++) {
-    const instruction = instructions[i];
-    const name = isStop ? getName(instruction) : instructionNames[instruction];
-    switch (instruction) {
-      case RIGHT:
-      case LEFT:
-      case AND:
-      case OR:
-      case XOR:
-      case LOAD:
-      case ADD:
-      case SUB:
-      case GOTO:
-      case IFZERO:
-        const operand = instructions[++i];
-        output.push(`${name} ${operand}`);
-        break;
-      case STOP:
-      case NOT:
-      case NOP:
-        if (instruction === STOP) {
-          isStop = true;
-        }
-        output.push(name);
-        break;
-      default:
-        output.push(`0x${instruction.toString(16).toUpperCase()}`);
-        break;
-    }
-    output.push("\n");
-  }
-  return output.join("");
-};
 const assemble = () => {
   const codeString = code.value;
   const lines = codeString.split("\n");
@@ -139,22 +101,23 @@ const assemble = () => {
   lines.forEach((line, index) => {
     const bytes = line.split(" ");
     bytes.forEach((byte) => {
-      if(bytes.startsWith(":")) {
-        labels[bytes.slice(1)] = index;
-      } else {
+      if (byte.startsWith(":")) {
+        labels[byte.slice(1)] = index;
+      } else if (byte) {
         commands.push(instructionsDict[byte] ?? parseInt(byte));
       }
     });
   });
   instructions = commands;
-  console.log(instructions);
+  code.value = instructions;
+
+  updateUi(true);
 };
 const assembleAndRun = async () => {
   assemble();
   await run();
 };
 const code = document.querySelector("#code");
-code.value = disassemble(instructions);
 
 const drawCircle = (x, y, radius, start = 0, end = 2 * Math.PI) => {
   ctx.beginPath();
@@ -259,14 +222,69 @@ const run = async () => {
 document.querySelector("#run").onclick = run;
 document.querySelector("#reset").onclick = reset;
 document.querySelector("#step").onclick = stepOnce;
-document.querySelector("#disassemble").onclick = disassemble;
-document.querySelector("#assemble").onclick = assemble;
-document.querySelector("#assembleAndRun").onclick = assembleAndRun;
+const disasm = document.querySelector("#disassemble");
+disasm.onclick = () => disassemble(instructions);
+
+const asmBtn = document.querySelector("#assemble");
+asmBtn.onclick = assemble;
+
+const asmR = document.querySelector("#assembleAndRun");
+asmR.onclick = assembleAndRun;
+
+const updateUi = (isBinary1) => {
+  disasm.disabled = !isBinary1;
+  asmBtn.disabled = isBinary1;
+  asmR.disabled = isBinary1;
+  isBinary = isBinary1;
+};
+
+const disassemble = (instructions) => {
+  const output = [];
+  let isStop = false;
+  const getName = (ins) =>
+    `0x${ins.toString(16).toUpperCase().padStart(2, "0")}`;
+  for (let i = 0; i < instructions.length; i++) {
+    const instruction = instructions[i];
+    const name = isStop ? getName(instruction) : instructionNames[instruction];
+    switch (instruction) {
+      case RIGHT:
+      case LEFT:
+      case AND:
+      case OR:
+      case XOR:
+      case LOAD:
+      case ADD:
+      case SUB:
+      case GOTO:
+      case IFZERO:
+        const operand = instructions[++i];
+        output.push(`${name} ${operand}`);
+        break;
+      case STOP:
+      case NOT:
+      case NOP:
+        if (instruction === STOP) {
+          isStop = true;
+        }
+        output.push(name);
+        break;
+      default:
+        output.push(`0x${instruction.toString(16).toUpperCase()}`);
+        break;
+    }
+    output.push("\n");
+  }
+  code.value = output.join("");
+
+  updateUi(false);
+
+  return code.value;
+};
 
 const download = function () {
   const link = document.createElement("a");
-  link.download = "toy_cpu_binary.tc";
-  const blob = new Blob([instructions], { type: "application/octet-stream" });
+  link.download = `toy_cpu_binary.tc${isBinary ? "b" : "s"}`;
+  const blob = new Blob([code.value], { type: "application/octet-stream" });
   const data = URL.createObjectURL(blob);
   link.href = data;
   link.click();
@@ -277,15 +295,21 @@ document.querySelector("#download").onclick = download;
 const fileInput = document.getElementById("upload");
 fileInput.onchange = (e) => {
   const selectedFile = e.srcElement.files[0];
+  const isBinary1 = selectedFile.name.endsWith(".tcb");
   const reader = new FileReader();
-  console.log(selectedFile, reader);
   reader.onload = (e) => {
     const buffer = e.target.result;
     const view = new Uint8Array(buffer);
     instructions = view;
-    code.value = disassemble(instructions);
   };
   reader.readAsArrayBuffer(selectedFile);
+
+  const reader1 = new FileReader();
+  reader1.onload = (e) => {
+    code.value = e.target.result;
+  };
+  reader1.readAsText(selectedFile);
+  updateUi(isBinary1);
 };
 
 const speedInput = document.querySelector("#speed");
@@ -335,7 +359,7 @@ const update = () => {
   let startY = 100;
   let spacing = 40;
   const isDesktop = false;
-  if(isDesktop) {
+  if (isDesktop) {
     startX = 480;
     startY = 25;
     spacing = 50;
@@ -350,7 +374,7 @@ const update = () => {
   ctx.fillText("Counter: " + counter, 30, 25);
   drawArray(400, 55, counter);
 
-  ctx.fillStyle = offColor; 
+  ctx.fillStyle = offColor;
   ctx.fillText("Instruction", startX, startY);
   startY += spacing;
   drawInstruction(startX + 370, startY);
@@ -393,7 +417,12 @@ const update = () => {
   ctx.fillText("o _ _ _ _ _ _ _ NOP", x1, y1 + 20 * 13);
 };
 
-update();
+const init = () => {
+  code.value = disassemble(instructions);
+  update();
+  disasm.disabled = true;
+};
+init();
 
 document.addEventListener("keydown", (e) => {
   if (isEditMode) {
