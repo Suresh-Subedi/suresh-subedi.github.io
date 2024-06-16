@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+  </head>
+
+  <body>
+    Transactions.csv
+    <input type="file" onchange="openFile(event)" />
+    <canvas id="area" style="width: 100%; max-width: 700px"></canvas>
+    <canvas id="pie" style="width: 100%; max-width: 700px"></canvas>
+    <canvas id="myChart" style="width: 100%; max-width: 700px"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script>
+      let shares = {};
+
+      function openFile(event) {
+        var input = event.target;
+
+        var reader = new FileReader();
+        reader.onload = function () {
+          var text = reader.result;
+          var lines = text.split("\n");
+          lines.shift(); //remove header line
+          lines.reverse(); //old first
+          let total = 0;
+          let i = 0;
+          for (const line of lines) {
+            const parts = line.split(",");
+            if (parts.length === 1) {
+              continue;
+            }
+            const quantity = parseInt(parts[6]);
+            const rate = parseFloat(parts[7]);
+            const name = parts[2];
+            xValues.push(parts[0]);
+            const subTotal = quantity * rate;
+            total += subTotal;
+            yValues.push(total);
+            if (!shares[name]) {
+              shares[name] = {};
+              shares[name].subTotal = subTotal;
+              shares[name].data = [...Array(i).fill(0)];
+            } else {
+              shares[name].subTotal += subTotal;
+            }
+            i++;
+            Object.keys(shares).forEach((x) => {
+              const previousValue = shares[x].data[shares[x].data.length - 1];
+              if (x === name) {
+                shares[name].data.push((previousValue ?? 0) + subTotal);
+              } else {
+                //shares[x].data.push(shares[x].data[i-1]);
+                shares[x].data.push(previousValue);
+              }
+            });
+          }
+
+          const barColors = [];
+          Object.keys(shares).forEach((element) => {
+            barColors.push(
+              `rgba(${Math.random() * 255},${Math.random() * 255},${
+                Math.random() * 255
+              },1.0`
+            );
+          });
+
+          const datasets = [];
+          Object.keys(shares).forEach((name, i) => {
+            const dataset = {};
+            dataset.fill = { target: -1 };
+            dataset.borderColor = barColors[i];
+            dataset.backgroundColor = barColors[i];
+            dataset.data = shares[name].data;
+            datasets.push(dataset);
+          });
+          const area = new Chart("area", {
+            type: "line",
+            data: {
+              labels: xValues,
+              datasets: datasets,
+            },
+            options: {
+              legend: { display: false },
+              scales: { 
+                //x: { stacked: true }, 
+                y: { stacked: true } 
+              },
+              plugins: {
+                filler: {
+                  propagate: false,
+                },
+              },
+            },
+          });
+
+          const myChart = new Chart("myChart", {
+            type: "line",
+            data: {
+              labels: xValues,
+              datasets: [
+                {
+                  backgroundColor: "rgba(0,0,255,1.0)",
+                  borderColor: "rgba(0,0,255,0.1)",
+                  data: yValues,
+                },
+              ],
+            },
+            options: { legend: { display: false } },
+          });
+
+          new Chart("pie", {
+            type: "pie",
+            data: {
+              labels: Object.keys(shares),
+              datasets: [
+                {
+                  backgroundColor: barColors,
+                  data: Object.values(shares).map((x) => x.subTotal),
+                },
+              ],
+            },
+            options: {
+              title: {
+                display: true,
+                text: "Shares",
+              },
+            },
+          });
+        };
+        reader.readAsText(input.files[0]);
+      }
+      const xValues = [];
+      const yValues = [];
+    </script>
+  </body>
+</html>
