@@ -5,7 +5,7 @@
 [About](/about)
 
 
-### Toy CPU Emulator
+### [Toy CPU Emulator](/emulator)
 Upload and/or download code as a binary file
 Change code
 Step through code
@@ -14,10 +14,10 @@ Assemble/disassemble code
 Run multiple existing programs
 Write your own program
 
-### React
+### [React](/react)
 Just trying to run react in github.
 Use https://ssubedi.com instead.
 This version is outdated.
 
-### Game
+### [Gam](/game)
 JS Game following youtube tutorial
